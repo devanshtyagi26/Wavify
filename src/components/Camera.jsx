@@ -149,96 +149,100 @@ export default function CameraFeed() {
   }, [audioCtx, audioLoaded]);
 
   return (
-    <div className="min-h-screen flex flex-col items-center justify-start bg-gradient-to-br from-zinc-950 via-indigo-950 to-zinc-900 p-6">
-      <Card className="w-full max-w-3xl relative bg-zinc-800 shadow-lg border-2 border-indigo-600/40">
-        <CardHeader>
-          <CardTitle className="text-4xl font-extrabold text-indigo-400 tracking-wider">
-            <span className="inline-flex items-center gap-2">
-              <svg width="32" height="32" fill="none" className="animate-pulse">
-                <circle cx="16" cy="16" r="14" stroke="cyan" strokeWidth="2" />
-                <circle cx="16" cy="16" r="4" fill="indigo" />
-              </svg>
+    <div className="min-h-screen flex flex-col items-center justify-center px-4 py-8 bg-gradient-to-br from-[#133164] via-[#141924] to-[#070a14] text-zinc-50">
+      <Card className="w-full max-w-4xl relative bg-[#18192B]/80 backdrop-blur-xl border-[3px] border-magenta-500/40 shadow-[0_10px_32px_1px_rgba(120,255,183,.14)] transition-all duration-500">
+        <CardHeader className="border-b border-[#292955] pb-2">
+          <CardTitle className="text-4xl font-black tracking-tight text-zinc-50 bg-gradient-to-r from-green-400 via-pink-500 to-purple-500 bg-clip-text flex items-center gap-3 uppercase">
+            <span className="relative flex items-center gap-2">
+              <span className="w-7 h-7 bg-gradient-to-r from-teal-400 to-fuchsia-500 opacity-95 rounded-full animate-pulse shadow-glow"></span>
               Wavify
             </span>
           </CardTitle>
-          <p className="text-indigo-200 mt-4 text-lg leading-relaxed">
-            <Badge className="bg-cyan-800 text-white mr-2">How to use</Badge>
-            Show both hands to your camera:
-            <br />
-            <span className="ml-2">
-              <Badge className="mr-2 bg-lime-600/40 text-lime-200 shadow">
-                Thumb-Index (Left): Volume
+          <div className="flex flex-wrap items-center mt-2 mb-3 gap-3">
+            <div className="flex flex-wrap gap-2 ml-1">
+              <Badge className="bg-green-700/80 text-green-200 border border-green-400 shadow">
+                Thumb-Index (L): Volume
               </Badge>
-              <Badge className="mr-2 bg-orange-600/40 text-orange-200 shadow">
-                Thumb-Index (Right): Pitch
+              <Badge className="bg-pink-700/80 text-pink-200 border border-pink-400 shadow">
+                Thumb-Index (R): Pitch
               </Badge>
-              <Badge className="bg-cyan-600/40 text-cyan-200 shadow">
+              <Badge className="bg-blue-700/80 text-blue-200 border border-blue-400 shadow">
                 Thumbs: Bass
               </Badge>
-            </span>
-            <br />
-            <span className="mt-2 block font-semibold text-sm text-indigo-300">
-              Clench a fist to PAUSE, open hand to PLAY.
-            </span>
-          </p>
+            </div>
+          </div>
+          <div className="flex items-center mt-1 gap-1 text-sm text-zinc-200 font-mono">
+            <span className="animate-pulse text-green-300">●</span>
+            Open hand = play | Fist = pause
+          </div>
         </CardHeader>
-        <CardContent>
-          <div className="flex gap-4 mt-2">
+        <CardContent className="flex flex-col items-center py-8">
+          <div className="flex gap-6 w-full mb-6">
             {!audioLoaded && (
               <Button
                 onClick={loadAudio}
-                className="flex-1 py-6 text-lg font-bold bg-gradient-to-r from-cyan-500 via-indigo-500 to-fuchsia-500 hover:brightness-125 animate-pulse"
+                className="flex-1 py-6 text-lg font-semibold rounded-xl bg-gradient-to-r from-green-400 to-fuchsia-500 shadow-lg hover:brightness-125 animate-pulse transition-all"
                 size="lg"
               >
-                <span className="uppercase tracking-wider">Start Audio</span>
+                <span className="uppercase tracking-widest">Start Audio</span>
               </Button>
             )}
             {audioLoaded && (
               <Button
                 onClick={stopAudio}
-                className="flex-1 py-6 text-lg font-bold bg-gradient-to-r from-pink-600 to-zinc-800 text-white hover:brightness-125"
+                className="flex-1 py-6 text-lg font-semibold rounded-xl bg-gradient-to-r from-fuchsia-600 to-blue-900 text-white drop-shadow-[0_0_8px_magenta] hover:brightness-110 transition-all"
                 size="lg"
                 variant="destructive"
               >
-                <span className="uppercase tracking-wider">Stop Audio</span>
+                <span className="uppercase tracking-widest">Stop Audio</span>
               </Button>
             )}
           </div>
-          <div className="relative flex items-center justify-center mt-8">
-            <div className="rounded-xl overflow-hidden ring-4 ring-indigo-700/80 shadow-xl bg-zinc-900">
+          <div className="relative flex items-center justify-center">
+            <div className="rounded-2xl overflow-hidden ring-8 ring-magenta-400/20 ring-offset-2 ring-offset-[#161621] shadow-2xl bg-black/60">
               <video
                 ref={videoRef}
                 autoPlay
                 playsInline
                 width={640}
                 height={480}
-                className="hidden opacity-0"
+                className="absolute opacity-0"
               />
               <canvas
                 ref={canvasRef}
                 width={640}
                 height={480}
                 className="relative top-0 left-0"
+                style={{ minWidth: 320, minHeight: 240 }}
               />
+            </div>
+            <div className="absolute z-10 top-3 right-3 flex items-center gap-2">
+              <span className="w-3 h-3 bg-green-400 rounded-full animate-pulse shadow" />
+              <span className="text-green-300 font-semibold font-mono text-xs">
+                {audioLoaded ? "Active" : "Idle"}
+              </span>
             </div>
           </div>
         </CardContent>
       </Card>
-      <p className="mt-6 text-zinc-300 text-center max-w-lg">
-        <i>Works best with good lighting.</i>
-        <br />
-        <i> Secure data—video/audio processed locally for privacy.</i>
-        <br />
-        <i className="flex gap-3 mt-2">
-          Created by Devansh Tyagi.{" "}
-          <Link
-            href="https://www.github.com/devanshtyagi26"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="flex items-center gap-1 hover:underline hover:text-amber-100"
-          >
-            <Github width={20} /> /devanshtyagi26
-          </Link>
+      <p className="mt-8 text-zinc-300 text-center max-w-lg text-sm leading-relaxed">
+        <i>
+          Works best with{" "}
+          <span className="text-green-400 font-semibold">good lighting</span>.
+          <br />
+          All processing is local and private.
+          <br />
+          <span className="flex items-center justify-center gap-2 mt-2">
+            Created by Devansh Tyagi.
+            <Link
+              href="https://www.github.com/devanshtyagi26"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex items-center gap-1 hover:underline hover:text-fuchsia-300"
+            >
+              <Github width={18} /> /devanshtyagi26
+            </Link>
+          </span>
         </i>
       </p>
     </div>
