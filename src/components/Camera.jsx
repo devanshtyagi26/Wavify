@@ -4,6 +4,11 @@ import { initAudioContext } from "@/utils/AudioController";
 import { isFist } from "@/utils/gestureUtils";
 import { drawHandLandmarks } from "@/utils/HandVisualiser";
 import { loadHandLandmarker } from "@/utils/useHandTracker";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Github } from "lucide-react";
+import Link from "next/link";
 
 export default function CameraFeed() {
   const videoRef = useRef(null);
@@ -30,6 +35,15 @@ export default function CameraFeed() {
     pitchRef.current = audio;
   };
 
+  const stopAudio = () => {
+    if (audioCtx && pitchRef.current) {
+      pitchRef.current.pause();
+      pitchRef.current.currentTime = 0; // Reset position
+      audioCtx.close();
+      setAudioCtx(null);
+      setAudioLoaded(false);
+    }
+  };
   useEffect(() => {
     let handLandmarker;
     let running = true;
@@ -52,7 +66,13 @@ export default function CameraFeed() {
           canvas.height = video.videoHeight;
           const ctx = canvas.getContext("2d");
           ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+          // Flip canvas horizontally for mirror view
+          ctx.save();
+          ctx.translate(canvas.width, 0);
+          ctx.scale(-1, 1);
           ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+          ctx.restore();
 
           const result = await handLandmarker.detectForVideo(video, Date.now());
           const hands = result.landmarks || [];
@@ -129,44 +149,96 @@ export default function CameraFeed() {
   }, [audioCtx, audioLoaded]);
 
   return (
-    <div>
-      <h1>Hand-Controlled Audio with Visualized Gesture Lines</h1>
-      <p>
-        <b>Instructions:</b> Hold both hands in front of the camera.
-        <br />- Thumb–index finger distance on{" "}
-        <span style={{ color: "lime" }}>left hand</span>: <b>Volume</b>.<br />-
-        Thumb–index finger distance on{" "}
-        <span style={{ color: "orange" }}>right hand</span>: <b>Pitch</b>.<br />
-        - Distance between <span style={{ color: "cyan" }}>both thumbs</span>:{" "}
-        <b>Bass</b>.<br />
+    <div className="min-h-screen flex flex-col items-center justify-start bg-gradient-to-br from-zinc-950 via-indigo-950 to-zinc-900 p-6">
+      <Card className="w-full max-w-3xl relative bg-zinc-800 shadow-lg border-2 border-indigo-600/40">
+        <CardHeader>
+          <CardTitle className="text-4xl font-extrabold text-indigo-400 tracking-wider">
+            <span className="inline-flex items-center gap-2">
+              <svg width="32" height="32" fill="none" className="animate-pulse">
+                <circle cx="16" cy="16" r="14" stroke="cyan" strokeWidth="2" />
+                <circle cx="16" cy="16" r="4" fill="indigo" />
+              </svg>
+              Wavify
+            </span>
+          </CardTitle>
+          <p className="text-indigo-200 mt-4 text-lg leading-relaxed">
+            <Badge className="bg-cyan-800 text-white mr-2">How to use</Badge>
+            Show both hands to your camera:
+            <br />
+            <span className="ml-2">
+              <Badge className="mr-2 bg-lime-600/40 text-lime-200 shadow">
+                Thumb-Index (Left): Volume
+              </Badge>
+              <Badge className="mr-2 bg-orange-600/40 text-orange-200 shadow">
+                Thumb-Index (Right): Pitch
+              </Badge>
+              <Badge className="bg-cyan-600/40 text-cyan-200 shadow">
+                Thumbs: Bass
+              </Badge>
+            </span>
+            <br />
+            <span className="mt-2 block font-semibold text-sm text-indigo-300">
+              Clench a fist to PAUSE, open hand to PLAY.
+            </span>
+          </p>
+        </CardHeader>
+        <CardContent>
+          <div className="flex gap-4 mt-2">
+            {!audioLoaded && (
+              <Button
+                onClick={loadAudio}
+                className="flex-1 py-6 text-lg font-bold bg-gradient-to-r from-cyan-500 via-indigo-500 to-fuchsia-500 hover:brightness-125 animate-pulse"
+                size="lg"
+              >
+                <span className="uppercase tracking-wider">Start Audio</span>
+              </Button>
+            )}
+            {audioLoaded && (
+              <Button
+                onClick={stopAudio}
+                className="flex-1 py-6 text-lg font-bold bg-gradient-to-r from-pink-600 to-zinc-800 text-white hover:brightness-125"
+                size="lg"
+                variant="destructive"
+              >
+                <span className="uppercase tracking-wider">Stop Audio</span>
+              </Button>
+            )}
+          </div>
+          <div className="relative flex items-center justify-center mt-8">
+            <div className="rounded-xl overflow-hidden ring-4 ring-indigo-700/80 shadow-xl bg-zinc-900">
+              <video
+                ref={videoRef}
+                autoPlay
+                playsInline
+                width={640}
+                height={480}
+                className="hidden opacity-0"
+              />
+              <canvas
+                ref={canvasRef}
+                width={640}
+                height={480}
+                className="relative top-0 left-0"
+              />
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+      <p className="mt-6 text-zinc-300 text-center max-w-lg">
+        <i>Works best with good lighting.</i>
         <br />
-        Click "Start Audio" to begin.
-      </p>
-      {!audioLoaded && (
-        <button onClick={loadAudio} style={{ fontSize: 24, padding: 16 }}>
-          Start Audio
-        </button>
-      )}
-      <div style={{ position: "relative", width: 640, height: 480 }}>
-        <video
-          ref={videoRef}
-          autoPlay
-          playsInline
-          width={640}
-          height={480}
-          style={{ position: "absolute", left: 0, top: 0, opacity: 0 }}
-        />
-        <canvas
-          ref={canvasRef}
-          width={640}
-          height={480}
-          style={{ position: "absolute", left: 0, top: 0, zIndex: 1 }}
-        />
-      </div>
-      <p style={{ color: "gray", marginTop: 20 }}>
-        <i>
-          Note: Works best with good lighting and when entire hand is visible in
-          the frame.
+        <i> Secure data—video/audio processed locally for privacy.</i>
+        <br />
+        <i className="flex gap-3 mt-2">
+          Created by Devansh Tyagi.{" "}
+          <Link
+            href="https://www.github.com/devanshtyagi26"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex items-center gap-1 hover:underline hover:text-amber-100"
+          >
+            <Github width={20} /> /devanshtyagi26
+          </Link>
         </i>
       </p>
     </div>
