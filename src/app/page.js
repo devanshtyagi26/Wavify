@@ -1,3 +1,5 @@
+import CameraFeed from "@/components/Camera";
+
 export default function Home() {
-  return <div>Hi</div>;
+  return <CameraFeed />;
 }
