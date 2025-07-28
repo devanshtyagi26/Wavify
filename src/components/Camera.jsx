@@ -9,6 +9,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Github } from "lucide-react";
 import Link from "next/link";
+import Logo from "./Logo";
 
 export default function CameraFeed() {
   const videoRef = useRef(null);
@@ -153,8 +154,8 @@ export default function CameraFeed() {
       <Card className="w-full max-w-4xl relative bg-[#18192B]/80 backdrop-blur-xl border-[3px] border-magenta-500/40 shadow-[0_10px_32px_1px_rgba(120,255,183,.14)] transition-all duration-500">
         <CardHeader className="border-b border-[#292955] pb-2">
           <CardTitle className="text-4xl font-black tracking-tight text-zinc-50 bg-gradient-to-r from-green-400 via-pink-500 to-purple-500 bg-clip-text flex items-center gap-3 uppercase">
-            <span className="relative flex items-center gap-2">
-              <span className="w-7 h-7 bg-gradient-to-r from-teal-400 to-fuchsia-500 opacity-95 rounded-full animate-pulse shadow-glow"></span>
+            <span className="relative flex items-center justify-center gap-2">
+              <Logo />
               Wavify
             </span>
           </CardTitle>
